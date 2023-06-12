@@ -1,11 +1,57 @@
 package com.epam.mjc.io;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class FileReader {
 
+    private Map<String, String> parseData(String data) {
+        Map<String, String> keyValuePairs = new HashMap<>();
+        String[] lines = data.split("\n");
+        for (String line : lines) {
+            String[] parts = line.trim().split(":");
+            if (parts.length == 2) {
+                keyValuePairs.put(parts[0].trim(), parts[1].trim());
+            }
+        }
+        return keyValuePairs;
+    }
+
+    public String getString(File file) throws IOException {
+        String data = "";
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file.getPath());
+            int c;
+            while((c = fileInputStream.read()) != -1){
+                data += (char) c;
+            }
+        } catch (IOException e){
+            System.err.println(e);
+        }finally {
+            if(fileInputStream != null){
+                fileInputStream.close();
+            }
+        }
+        return data;
+    }
+
     public Profile getDataFromFile(File file) {
-        return new Profile();
+        String data = "";
+        try {
+            data = getString(file);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        Map<String, String> keyValuePairs = parseData(data);
+        String name = keyValuePairs.get("Name");
+        int age = Integer.parseInt(keyValuePairs.get("Age"));
+        String email = keyValuePairs.get("Email");
+        Long phone = Long.parseLong(keyValuePairs.get("Age"));
+        return new Profile(name, age, email, phone);
     }
 }
