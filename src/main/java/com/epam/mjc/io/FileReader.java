@@ -21,32 +21,22 @@ public class FileReader {
         return keyValuePairs;
     }
 
-    public String getString(File file) throws IOException {
-        String data = "";
-        FileInputStream fileInputStream = null;
-        try {
-            fileInputStream = new FileInputStream(file.getPath());
+    public String getString(File file) {
+        StringBuilder data = new StringBuilder();
+
+        try (FileInputStream fileInputStream = new FileInputStream(file.getPath())) {
             int c;
             while((c = fileInputStream.read()) != -1){
-                data += (char) c;
+                data.append((char)c);
             }
-        } catch (IOException e){
-            System.err.println(e);
-        }finally {
-            if(fileInputStream != null){
-                fileInputStream.close();
-            }
+        }catch (IOException e) {
+            e.printStackTrace();
         }
-        return data;
+        return new String(data);
     }
 
     public Profile getDataFromFile(File file) {
-        String data = "";
-        try {
-            data = getString(file);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
+        String data = getString(file);
         Map<String, String> keyValuePairs = parseData(data);
         String name = keyValuePairs.get("Name");
         int age = Integer.parseInt(keyValuePairs.get("Age"));
